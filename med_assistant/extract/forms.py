@@ -5,4 +5,4 @@ from .models import UserInputPost
 class UserInputPostForm(forms.ModelForm):
     class Meta:
         model = UserInputPost
-        fields = ('patient_id', 'patient_name')
+        fields = ('patient_records', 'prompt_info')

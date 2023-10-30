@@ -4,8 +4,8 @@ from django.db import models
 # TODO(avery): add user authentication
 
 class UserInputPost(models.Model):
-    patient_id = models.CharField(max_length=100)
-    patient_name = models.CharField(max_length=100)
+    patient_records = models.FileField(upload_to="documents/")
+    prompt_info = models.TextField()
 
     def __str__(self):
-        return f"id: {self.patient_id} name: {self.patient_name}"
+        return f"prompt_info: {self.prompt_info}"
