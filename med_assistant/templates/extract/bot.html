@@ -1,0 +1,201 @@
+{% load static %}
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href='{% static "font-awesome.min.css" %}' rel="stylesheet">
+<link href='{% static "Material+Icons" %}' rel="stylesheet">
+<link href='{% static "bootstrap.min.css" %}' rel="stylesheet">
+<link rel="stylesheet" type="text/css" href='{% static "main.css" %}'>
+
+
+
+
+<div class="container">
+
+	<div class="row padded_row">
+
+		<!-- right side content -->
+		<div class="col-md-7">
+
+			<div class="chat_window">
+
+				<div class="top_menu">
+					<div class="title">ChatBot - Med Assistant</div>
+				</div>
+
+				<!-- dynamically rendered -->
+				<ul class="messages"></ul>
+
+				<!-- input -->
+				<div class="bottom_wrapper">
+					<input id="msg_input" placeholder="Say Hi to begin chat..." />
+					<div id="send_button" class="app_button_1">Send</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		<!-- left side content -->
+		<div class="col-md-5">
+			<div class="chat_window">
+
+				<div class="top_menu">
+					<div class="title">Help</div>
+				</div>
+
+				<!-- help container -->
+				<div class="panel-group" id="accordion">
+
+					<!-- help - 1 -->
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion"
+									href="#collapse1">Med Assistant Functionality</a>
+							</h4>
+						</div>
+						<div id="collapse1" class="panel-collapse collapse in">
+							<div class="panel-body">
+								balblablabla...
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+</div>
+
+<!-- vendor script files -->
+<script src='{% static "jquery-2.2.4.min.js" %}'></script>
+<script src='{% static "bootstrap.min.js" %}'></script>
+
+<!-- custom scripts -->
+{% block javascript	%}
+<script>
+/**
+ * Returns the current datetime for the message creation.
+ */
+function getCurrentTimestamp() {
+	return new Date();
+}
+
+/**
+ * Renders a message on the chat screen based on the given arguments.
+ * This is called from the `showUserMessage` and `showBotMessage`.
+ */
+function renderMessageToScreen(args) {
+	// local variables
+	let displayDate = (args.time || getCurrentTimestamp()).toLocaleString('en-IN', {
+		month: 'short',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+	});
+	let messagesContainer = $('.messages');
+
+	// init element
+	let message = $(`
+	<li class="message ${args.message_side}">
+		<div class="avatar"></div>
+		<div class="text_wrapper">
+			<div class="text">${args.text}</div>
+			<div class="timestamp">${displayDate}</div>
+		</div>
+	</li>
+	`);
+
+	// add to parent
+	messagesContainer.append(message);
+
+	// animations
+	setTimeout(function () {
+		message.addClass('appeared');
+	}, 0);
+	messagesContainer.animate({ scrollTop: messagesContainer.prop('scrollHeight') }, 300);
+}
+
+/**
+ * Displays the user message on the chat screen. This is the right side message.
+ */
+function showUserMessage(message, datetime) {
+	renderMessageToScreen({
+		text: message,
+		time: datetime,
+		message_side: 'right',
+	});
+}
+
+/**
+ * Displays the chatbot message on the chat screen. This is the left side message.
+ */
+function showBotMessage(message, datetime) {
+	renderMessageToScreen({
+		text: message,
+		time: datetime,
+		message_side: 'left',
+	});
+}
+
+/**
+ * Get input from user and show it on screen on button click.
+ */
+$('#send_button').on('click', function (e) {
+	e.preventDefault();
+	
+	// get and show message and reset input
+	showUserMessage($('#msg_input').val());
+	var input = $('#msg_input').val();
+
+	$.ajax({
+		url: "{% url 'extract:extract_patient_related_data' %}",
+		type: 'POST',
+		data: input,
+		success: function (data) {
+			showBotMessage(data);
+		},
+		error: function(data) {
+			showBotMessage("Sorry, something went wrong!");
+		}
+	});
+
+	$('#msg_input').val('');
+});
+
+/**
+ * Returns a random string. Just to specify bot message to the user.
+ */
+function randomstring(length = 20) {
+	let output = '';
+
+	// magic function
+	var randomchar = function () {
+		var n = Math.floor(Math.random() * 62);
+		if (n < 10) return n;
+		if (n < 36) return String.fromCharCode(n + 55);
+		return String.fromCharCode(n + 61);
+	};
+
+	while (output.length < length) output += randomchar();
+	return output;
+}
+
+/**
+ * Set initial bot message to the screen for the user.
+ */
+$(window).on('load', function () {
+	showBotMessage('Hello there! Type in a message.');
+});
+</script>
+
+{% endblock javascript %}
+
+
+
+</html>

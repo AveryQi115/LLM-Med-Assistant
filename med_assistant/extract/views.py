@@ -3,12 +3,12 @@ from django.http import HttpResponse
 from .forms import UserInputPostForm
 from django.core.files.storage import FileSystemStorage
 from .models import UserInputPost
+from django.views.decorators.csrf import csrf_exempt
 import os
-import requests
 
 #TODO(avery): user authentication
 
-def extract_patient_related_data(request):
+def extract_patient_related_data_hidden(request):
     if request.method == "POST":
         input_post_form = UserInputPostForm(request.POST, request.FILES)
         if input_post_form.is_valid():
@@ -63,7 +63,7 @@ def extract_patient_related_data(request):
             
             api_url = os.environ.get('API_URL')
             
-            response = requests.post(api_url, json=data)
+            response = request.post(api_url, json=data)
             
             # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
@@ -82,3 +82,10 @@ def extract_patient_related_data(request):
         input_post_form = UserInputPostForm()
         context = {"input_post_form": input_post_form}
     return render(request, "extract/extract_patient_related_data.html", context)
+
+
+@csrf_exempt
+def extract_patient_related_data(request):
+    if request.method == "POST":
+        return HttpResponse("POST requested")
+    return render(request, "extract/bot.html")
