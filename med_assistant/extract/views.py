@@ -87,6 +87,9 @@ def extract_patient_related_data_hidden(request):
 @csrf_exempt
 def extract_patient_related_data(request):
     if request.method == "POST":
+        input_post_form = UserInputPostForm(request.POST, request.FILES)
+        if input_post_form.is_valid():
+            input_post_form.save()
         return HttpResponse("POST requested")
     input_post_form = UserInputPostForm()
     context = {"input_post_form": input_post_form}

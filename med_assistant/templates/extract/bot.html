@@ -153,15 +153,23 @@ function showBotMessage(message, datetime) {
  */
 $('#send_button').on('click', function (e) {
 	e.preventDefault();
-	
+
 	// get and show message and reset input
 	showUserMessage($('#msg_input').val());
 	var input = $('#msg_input').val();
+	var files = $('#patient_records')[0].files;
+
+	var formData = new FormData();
+    formData.append("prompt_info", input);
+	formData.append("patient_records", files[0]);
 
 	$.ajax({
 		url: "{% url 'extract:extract_patient_related_data' %}",
 		type: 'POST',
-		data: input,
+		cache: false,
+        contentType: false,
+        processData: false,
+		data: formData,
 		success: function (data) {
 			showBotMessage(data);
 		},
