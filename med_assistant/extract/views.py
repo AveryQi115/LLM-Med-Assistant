@@ -88,4 +88,6 @@ def extract_patient_related_data_hidden(request):
 def extract_patient_related_data(request):
     if request.method == "POST":
         return HttpResponse("POST requested")
-    return render(request, "extract/bot.html")
+    input_post_form = UserInputPostForm()
+    context = {"input_post_form": input_post_form}
+    return render(request, "extract/bot.html", context)
