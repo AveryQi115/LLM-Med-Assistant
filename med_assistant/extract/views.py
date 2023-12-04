@@ -92,5 +92,5 @@ def extract_patient_related_data(request):
             input_post_form.save()
         return HttpResponse("POST requested")
     input_post_form = UserInputPostForm()
-    context = {"input_post_form": input_post_form}
+    context = {"input_post_form": input_post_form, "generations": ["Hi", "Hello", "How are you?"]}
     return render(request, "extract/bot.html", context)
