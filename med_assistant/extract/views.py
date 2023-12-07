@@ -5,6 +5,7 @@ from django.core.files.storage import FileSystemStorage
 from .models import UserInputPost
 from django.views.decorators.csrf import csrf_exempt
 import os
+import json
 
 #TODO(avery): user authentication
 
@@ -90,7 +91,15 @@ def extract_patient_related_data(request):
         input_post_form = UserInputPostForm(request.POST, request.FILES)
         if input_post_form.is_valid():
             input_post_form.save()
-        return HttpResponse("POST requested")
+        return HttpResponse(json.dumps({"data": "Request posted", "generations":["generation 1"]}), content_type="application/json")
     input_post_form = UserInputPostForm()
-    context = {"input_post_form": input_post_form, "generations": ["Hi", "Hello", "How are you?"]}
+    context = {"input_post_form": input_post_form}
     return render(request, "extract/bot.html", context)
+
+@csrf_exempt
+def generate(request):
+    if request.method == "POST":
+        data = request.POST.get("generations")
+        print(data)
+        return HttpResponse(f"{data}")
+    return HttpResponse("generate cannot called through get")

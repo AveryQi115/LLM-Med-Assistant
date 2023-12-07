@@ -10,4 +10,5 @@ urlpatterns = [
         name="extract_patient_related_data_hidden",
     ),
     path("extract_patient_related_data", views.extract_patient_related_data, name="extract_patient_related_data"),
+    path("generate", views.generate, name="generate"),
 ]
