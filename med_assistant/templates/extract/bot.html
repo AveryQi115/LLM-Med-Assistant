@@ -196,6 +196,8 @@ $('#send_button').on('click', function (e) {
 	var input = $('#msg_input').val();
 	var files = $('#patient_records')[0].files;
 
+	showBotMessage("Processing your request...");
+
 	var formData = new FormData();
     formData.append("prompt_info", input);
 	formData.append("patient_records", files[0]);

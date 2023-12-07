@@ -91,7 +91,13 @@ def extract_patient_related_data(request):
         input_post_form = UserInputPostForm(request.POST, request.FILES)
         if input_post_form.is_valid():
             input_post_form.save()
-        return HttpResponse(json.dumps({"data": "Request posted", "generations":["generation 1"]}), content_type="application/json")
+        ret = os.system(f"srun -c 16 --mem=128Gb --gres=gpu:1 extract/generate_result.sh {input_post_form.cleaned_data['patient_records'].name}")
+        print(ret)
+        with open("generations/result.txt", "r") as f:
+            data = f.read()
+        assert(type(data) == str, f"{type(data)}")
+        sections = data.split("##")
+        return HttpResponse(json.dumps({"data": "Request process done, you can now choose your own section", "generations":sections}), content_type="application/json")
     input_post_form = UserInputPostForm()
     context = {"input_post_form": input_post_form}
     return render(request, "extract/bot.html", context)
